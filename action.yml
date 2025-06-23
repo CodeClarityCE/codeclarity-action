@@ -29,6 +29,31 @@ inputs:
     required: true
     default: 'JavaScript Analyzer'
 
+  failOnCritical:
+    description: Fail the action if critical vulnerabilities are found
+    required: false
+    default: 'true'
+
+  failOnHigh:
+    description: Fail the action if high vulnerabilities are found
+    required: false
+    default: 'true'
+
+  failOnMedium:
+    description: Fail the action if medium vulnerabilities are found
+    required: false
+    default: 'true'
+
+  failOnLow:
+    description: Fail the action if low vulnerabilities are found
+    required: false
+    default: 'true'
+
+  failOnInfo:
+    description: Fail the action if info vulnerabilities are found
+    required: false
+    default: 'true'
+
 # Define your outputs here.
 outputs:
   vulnerabilities:

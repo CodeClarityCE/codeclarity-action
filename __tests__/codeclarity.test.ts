@@ -11,9 +11,9 @@ import {
 
 describe('codeclarity.ts', () => {
   it('Tries to authenticate', async () => {
-    const email = 'john.doe@codeclarity.io'
-    const password = 'ThisIs4Str0ngP4ssW0rd?'
-    const domain = 'localhost'
+    const email = process.env.EMAIL || 'john.doe@codeclarity.io'
+    const password = process.env.PASSWORD || 'ThisIs4Str0ngP4ssW0rd?'
+    const domain = process.env.DOMAIN || 'localhost'
     const projectName = 'CodeClarityCE/frontend'
     const analyzerName = 'JavaScript Analyzer'
 

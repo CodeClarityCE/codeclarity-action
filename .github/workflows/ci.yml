@@ -15,6 +15,10 @@ jobs:
   test-typescript:
     name: TypeScript Tests
     runs-on: ubuntu-latest
+    env:
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      DOMAIN: ${{ secrets.DOMAIN }}
 
     steps:
       - name: Checkout
@@ -45,7 +49,7 @@ jobs:
         run: npm run ci-test
 
   test-action:
-    name: GitHub Actions Test
+    name: CodeClarity Actions Test
     runs-on: ubuntu-latest
     env:
       EMAIL: ${{ secrets.EMAIL }}
@@ -57,21 +61,23 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
-      - name: Extract branch name
-        shell: bash
-        run:
-          echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >>
-          $GITHUB_OUTPUT
-        id: extract_branch
+      - name: Get branch names.
+        id: branch-names
+        uses: tj-actions/branch-names@v8
 
-      - name: Test Local Action
+      - name: Test Local CodeClarity Action
         id: test-action
         uses: ./
         with:
-          branch: ${{ steps.extract_branch.outputs.branch }}
+          branch: ${{ steps.branch-names.outputs.current_branch }}
           serverUrl: ${{ github.server_url }}
           projectName: ${{ github.repository }}
           analyzerName: 'JS Analyser'
+          failOnCritical: false
+          failOnHigh: false
+          failOnMedium: false
+          failOnLow: false
+          failOnInfo: false
 
       - name: Print Output
         id: output

@@ -1,3 +1,5 @@
+# CodeClarity GitHub Action
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://github.com/CodeClarityCE/identity/blob/main/logo/vectorized/logo_name_white.svg">
   <source media="(prefers-color-scheme: light)" srcset="https://github.com/CodeClarityCE/identity/blob/main/logo/vectorized/logo_name_black.svg">
@@ -14,20 +16,26 @@ Secure your software empower your team.
 [![CodeQL](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/actions/typescript-action/actions/workflows/codeql-analysis.yml)
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
 
-CodeClarity is an open-source alternative to Snyk, Checkmarx, and Black Duck, offering fast source code analysis to identify dependencies, licenses, and vulnerabilities instantly.
+CodeClarity is an open-source alternative to Snyk, Checkmarx, and Black Duck,
+offering fast source code analysis to identify dependencies, licenses, and
+vulnerabilities instantly.
 
 It runs fully on-premises, giving you full control over your code.
 
-Integrate CodeClarity into your CI/CD (e.g., GitHub Actions, Bash) to block vulnerable code automatically.
+Integrate CodeClarity into your CI/CD (e.g., GitHub Actions, Bash) to block
+vulnerable code automatically.
 
-Create custom analysis pipelines by linking plugins. Currently, there are three in-house plugins (SBOM builder, vulnerability finder, license finder) and one external (CodeQL), with more coming soon.
+Create custom analysis pipelines by linking plugins. Currently, there are three
+in-house plugins (SBOM builder, vulnerability finder, license finder) and one
+external (CodeQL), with more coming soon.
 
 ![CodeClarity! Secure your software empower your team!](https://github.com/CodeClarityCE/identity/blob/main/illustration/rasterized/demo_illu.png)
 
 <details open="open">
 <summary>Table of Contents</summary>
 
-- [Overview](#overview)
+- [CodeClarity GitHub Action](#codeclarity-github-action)
+  - [Overview](#overview)
 
 </details>
 
