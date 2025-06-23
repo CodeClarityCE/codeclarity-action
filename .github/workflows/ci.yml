@@ -57,16 +57,15 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
-      - name: Extract branch name
-        shell: bash
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-        id: extract_branch
+      - name: Get branch names.
+        id: branch-names
+        uses: tj-actions/branch-names@v8
 
       - name: Test Local Action
         id: test-action
         uses: ./
         with:
-          branch: ${{ steps.extract_branch.outputs.branch }}
+          branch: ${{ steps.branch-names.outputs.current_branch }}
           serverUrl: ${{ github.server_url }}
           projectName: ${{ github.repository }}
           analyzerName: 'JS Analyser'
