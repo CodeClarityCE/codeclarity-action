@@ -136,35 +136,43 @@ export async function run(): Promise<void> {
 
     core.debug(new Date().toTimeString())
 
-    switch (true) {
-      case result.data.number_of_critical > 0:
-        core.warning(
-          `CodeClarity found ${result.data.number_of_critical} critical vulnerabilit${result.data.number_of_critical !== 1 ? 'ies' : 'y'}`
-        )
-        break
-      case result.data.number_of_high > 0:
-        core.warning(
-          `CodeClarity found ${result.data.number_of_high} high vulnerabilit${result.data.number_of_high !== 1 ? 'ies' : 'y'}`
-        )
-        break
-      case result.data.number_of_medium > 0:
-        core.warning(
-          `CodeClarity found ${result.data.number_of_medium} medium vulnerabilit${result.data.number_of_medium !== 1 ? 'ies' : 'y'}`
-        )
-        break
-      case result.data.number_of_low > 0:
-        core.warning(
-          `CodeClarity found ${result.data.number_of_low} low vulnerabilit${result.data.number_of_low !== 1 ? 'ies' : 'y'}`
-        )
-        break
-      case result.data.number_of_none > 0:
-        core.warning(
-          `CodeClarity found ${result.data.number_of_none} none vulnerabilit${result.data.number_of_none !== 1 ? 'ies' : 'y'}`
-        )
-        break
-      default:
-        // No vulnerabilities found, do nothing
-        break
+    const severityLevels = [
+      {
+        key: 'critical',
+        count: result.data.number_of_critical,
+        fail: core.getInput('failOnCritical') === 'true'
+      },
+      {
+        key: 'high',
+        count: result.data.number_of_high,
+        fail: core.getInput('failOnHigh') === 'true'
+      },
+      {
+        key: 'medium',
+        count: result.data.number_of_medium,
+        fail: core.getInput('failOnMedium') === 'true'
+      },
+      {
+        key: 'low',
+        count: result.data.number_of_low,
+        fail: core.getInput('failOnLow') === 'true'
+      },
+      {
+        key: 'none',
+        count: result.data.number_of_none,
+        fail: core.getInput('failOnNone') === 'true'
+      }
+    ]
+
+    for (const level of severityLevels) {
+      if (level.count > 0) {
+        const message = `CodeClarity found ${level.count} ${level.key} vulnerabilit${level.count !== 1 ? 'ies' : 'y'}`
+        if (level.fail) {
+          core.setFailed(message)
+        } else {
+          core.warning(message)
+        }
+      }
     }
 
     // Set outputs for other workflow steps to use

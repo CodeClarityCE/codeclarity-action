@@ -73,6 +73,11 @@ jobs:
           serverUrl: ${{ github.server_url }}
           projectName: ${{ github.repository }}
           analyzerName: 'JS Analyser'
+          failOnCritical: false
+          failOnHigh: false
+          failOnMedium: false
+          failOnLow: false
+          failOnInfo: false
 
       - name: Print Output
         id: output
