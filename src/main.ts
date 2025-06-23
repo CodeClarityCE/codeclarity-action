@@ -136,6 +136,18 @@ export async function run(): Promise<void> {
 
     core.debug(new Date().toTimeString())
 
+    switch (true) {
+      case result.data.number_of_critical > 0:
+        core.setFailed('There is a critical vulnerability')
+        break
+      case result.data.number_of_high > 0:
+        core.setFailed('There is a high vulnerability')
+        break
+      default:
+        // No vulnerabilities found, do nothing
+        break
+    }
+
     // Set outputs for other workflow steps to use
     core.setOutput('vulnerabilities', result)
   } catch (error) {
