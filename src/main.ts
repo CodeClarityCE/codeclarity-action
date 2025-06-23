@@ -138,10 +138,19 @@ export async function run(): Promise<void> {
 
     switch (true) {
       case result.data.number_of_critical > 0:
-        core.setFailed('There is a critical vulnerability')
+        core.warning('There is a critical vulnerability')
         break
       case result.data.number_of_high > 0:
-        core.setFailed('There is a high vulnerability')
+        core.warning('There is a high vulnerability')
+        break
+      case result.data.number_of_medium > 0:
+        core.warning('There is a medium vulnerability')
+        break
+      case result.data.number_of_low > 0:
+        core.warning('There is a low vulnerability')
+        break
+      case result.data.number_of_none > 0:
+        core.warning('There is a none vulnerability')
         break
       default:
         // No vulnerabilities found, do nothing

@@ -27613,10 +27613,19 @@ async function run() {
         coreExports.debug(new Date().toTimeString());
         switch (true) {
             case result.data.number_of_critical > 0:
-                coreExports.setFailed('There is a critical vulnerability');
+                coreExports.warning('There is a critical vulnerability');
                 break;
             case result.data.number_of_high > 0:
-                coreExports.setFailed('There is a high vulnerability');
+                coreExports.warning('There is a high vulnerability');
+                break;
+            case result.data.number_of_medium > 0:
+                coreExports.warning('There is a medium vulnerability');
+                break;
+            case result.data.number_of_low > 0:
+                coreExports.warning('There is a low vulnerability');
+                break;
+            case result.data.number_of_none > 0:
+                coreExports.warning('There is a none vulnerability');
                 break;
             default:
                 // No vulnerabilities found, do nothing
