@@ -27469,12 +27469,12 @@ async function getResult(token, organizationId, projectId, analysisId, domain) {
  * @param integrationID Integration ID.
  * @returns Resolves with 'done!' after the wait is over.
  */
-async function importProject(token, domain, organizationID, integrationID, projectName) {
+async function importProject(token, serverUrl, domain, organizationID, integrationID, projectName) {
     return new Promise((resolve) => {
         // Perform an HTTP POST request using fetch
         const requestBody = {
             integration_id: integrationID,
-            url: 'https://github.com/' + projectName,
+            url: `https://${serverUrl}/${projectName}`,
             name: projectName,
             description: 'Imported by Github Action'
         };
@@ -27554,6 +27554,7 @@ async function startAnalysis(token, domain, organizationID, projectID, analyzerI
 async function run() {
     try {
         const branch = coreExports.getInput('branch');
+        const serverUrl = coreExports.getInput('serverUrl');
         let projectName = coreExports.getInput('projectName');
         let analyzerName = coreExports.getInput('analyzerName');
         // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
@@ -27590,7 +27591,7 @@ async function run() {
             // Retrieve integration
             const integrationId = await getGithuIntegration(userToken, organizationId, domain);
             coreExports.debug('Integration ID: ' + integrationId);
-            projectId = await importProject(userToken, domain, organizationId, integrationId, coreExports.getInput('projectName'));
+            projectId = await importProject(userToken, serverUrl, domain, organizationId, integrationId, coreExports.getInput('projectName'));
             coreExports.debug('Integration ID: ' + projectId);
         }
         // Retrieve analyzer

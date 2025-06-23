@@ -19,6 +19,7 @@ import {
 export async function run(): Promise<void> {
   try {
     const branch: string = core.getInput('branch')
+    const serverUrl: string = core.getInput('serverUrl')
     let projectName: string = core.getInput('projectName')
     let analyzerName: string = core.getInput('analyzerName')
 
@@ -78,6 +79,7 @@ export async function run(): Promise<void> {
 
       projectId = await importProject(
         userToken,
+        serverUrl,
         domain,
         organizationId,
         integrationId,

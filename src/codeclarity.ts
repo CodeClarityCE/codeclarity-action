@@ -323,6 +323,7 @@ export async function getResult(
  */
 export async function importProject(
   token: string,
+  serverUrl: string,
   domain: string,
   organizationID: string,
   integrationID: string,
@@ -332,7 +333,7 @@ export async function importProject(
     // Perform an HTTP POST request using fetch
     const requestBody = {
       integration_id: integrationID,
-      url: 'https://github.com/' + projectName,
+      url: `https://${serverUrl}/${projectName}`,
       name: projectName,
       description: 'Imported by Github Action'
     }

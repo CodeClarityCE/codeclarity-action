@@ -69,6 +69,7 @@ jobs:
         uses: ./
         with:
           branch: ${{ steps.extract_branch.outputs.branch }}
+          serverUrl: ${{ github.server_url }}
           projectName: ${{ github.repository }}
           analyzerName: 'JS Analyser'
 
