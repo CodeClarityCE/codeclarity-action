@@ -15,6 +15,10 @@ jobs:
   test-typescript:
     name: TypeScript Tests
     runs-on: ubuntu-latest
+    env:
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      DOMAIN: ${{ secrets.DOMAIN }}
 
     steps:
       - name: Checkout
