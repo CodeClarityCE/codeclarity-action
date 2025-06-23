@@ -138,19 +138,29 @@ export async function run(): Promise<void> {
 
     switch (true) {
       case result.data.number_of_critical > 0:
-        core.warning('There is a critical vulnerability')
+        core.warning(
+          `CodeClarity found ${result.data.number_of_critical} critical vulnerabilit${result.data.number_of_critical !== 1 ? 'ies' : 'y'}`
+        )
         break
       case result.data.number_of_high > 0:
-        core.warning('There is a high vulnerability')
+        core.warning(
+          `CodeClarity found ${result.data.number_of_high} high vulnerabilit${result.data.number_of_high !== 1 ? 'ies' : 'y'}`
+        )
         break
       case result.data.number_of_medium > 0:
-        core.warning('There is a medium vulnerability')
+        core.warning(
+          `CodeClarity found ${result.data.number_of_medium} medium vulnerabilit${result.data.number_of_medium !== 1 ? 'ies' : 'y'}`
+        )
         break
       case result.data.number_of_low > 0:
-        core.warning('There is a low vulnerability')
+        core.warning(
+          `CodeClarity found ${result.data.number_of_low} low vulnerabilit${result.data.number_of_low !== 1 ? 'ies' : 'y'}`
+        )
         break
       case result.data.number_of_none > 0:
-        core.warning('There is a none vulnerability')
+        core.warning(
+          `CodeClarity found ${result.data.number_of_none} none vulnerabilit${result.data.number_of_none !== 1 ? 'ies' : 'y'}`
+        )
         break
       default:
         // No vulnerabilities found, do nothing

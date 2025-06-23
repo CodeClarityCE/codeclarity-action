@@ -49,7 +49,7 @@ jobs:
         run: npm run ci-test
 
   test-action:
-    name: GitHub Actions Test
+    name: CodeClarity Actions Test
     runs-on: ubuntu-latest
     env:
       EMAIL: ${{ secrets.EMAIL }}
@@ -65,7 +65,7 @@ jobs:
         id: branch-names
         uses: tj-actions/branch-names@v8
 
-      - name: Test Local Action
+      - name: Test Local CodeClarity Action
         id: test-action
         uses: ./
         with:
