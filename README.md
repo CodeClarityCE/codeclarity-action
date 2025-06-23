@@ -3,8 +3,6 @@
   <source media="(prefers-color-scheme: light)" srcset="https://github.com/CodeClarityCE/identity/blob/main/logo/vectorized/logo_name_black.svg">
   <img alt="codeclarity-logo" src="https://github.com/CodeClarityCE/identity/blob/main/logo/vectorized/logo_name_black.svg">
 </picture>
-<br>
-<br>
 
 Secure your software empower your team.
 
@@ -24,11 +22,7 @@ Integrate CodeClarity into your CI/CD (e.g., GitHub Actions, Bash) to block vuln
 
 Create custom analysis pipelines by linking plugins. Currently, there are three in-house plugins (SBOM builder, vulnerability finder, license finder) and one external (CodeQL), with more coming soon.
 
-<br>
-
 ![CodeClarity! Secure your software empower your team!](https://github.com/CodeClarityCE/identity/blob/main/illustration/rasterized/demo_illu.png)
-
-<br>
 
 <details open="open">
 <summary>Table of Contents</summary>
