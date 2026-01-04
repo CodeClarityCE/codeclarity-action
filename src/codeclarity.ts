@@ -11,7 +11,7 @@ export async function authenticate(
   password: string,
   domain: string
 ): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     // Perform an HTTP POST request using fetch
     const requestBody = {
       email: email,
@@ -32,14 +32,26 @@ export async function authenticate(
       },
       body: JSON.stringify(requestBody)
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            `Authentication failed with status ${response.status}`
+          )
+        }
+        return response.json()
+      })
       .then((data) => {
-        // Handle the received data, e.g., save to auth_tokens.json
-        resolve((data as responseBody).data.token)
+        const token = (data as responseBody).data?.token
+        if (!token) {
+          throw new Error('Authentication failed: no token received')
+        }
+        resolve(token)
       })
       .catch((error) => {
         console.error('Error during authentication:', error)
-        // rejects(new Error('Failed to authenticate'))
+        reject(
+          error instanceof Error ? error : new Error('Failed to authenticate')
+        )
       })
   })
 }
@@ -52,7 +64,7 @@ export async function authenticate(
  * @returns Resolves with 'done!' after the wait is over.
  */
 export async function getUser(token: string, domain: string): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     interface responseBody {
       data: {
         id: string
@@ -66,14 +78,22 @@ export async function getUser(token: string, domain: string): Promise<string> {
         Authorization: `Bearer ${token}`
       }
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to get user with status ${response.status}`)
+        }
+        return response.json()
+      })
       .then((data) => {
-        // Handle the received data, e.g., save to auth_tokens.json
-        resolve((data as responseBody).data.id)
+        const userId = (data as responseBody).data?.id
+        if (!userId) {
+          throw new Error('Failed to get user: no user ID received')
+        }
+        resolve(userId)
       })
       .catch((error) => {
-        console.error('Error during authentication:', error)
-        // rejects(new Error('Failed to authenticate'))
+        console.error('Error getting user:', error)
+        reject(error instanceof Error ? error : new Error('Failed to get user'))
       })
   })
 }
@@ -89,7 +109,7 @@ export async function getOrganization(
   token: string,
   domain: string
 ): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     interface Organization {
       organization: {
         id: string
@@ -107,14 +127,28 @@ export async function getOrganization(
         Authorization: `Bearer ${token}`
       }
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            `Failed to get organization with status ${response.status}`
+          )
+        }
+        return response.json()
+      })
       .then((data) => {
-        // Handle the received data, e.g., save to auth_tokens.json
-        resolve((data as responseBody).data[0].organization.id)
+        const orgId = (data as responseBody).data?.[0]?.organization?.id
+        if (!orgId) {
+          throw new Error('Failed to get organization: no organization found')
+        }
+        resolve(orgId)
       })
       .catch((error) => {
-        console.error('Error during authentication:', error)
-        // rejects(new Error('Failed to authenticate'))
+        console.error('Error getting organization:', error)
+        reject(
+          error instanceof Error
+            ? error
+            : new Error('Failed to get organization')
+        )
       })
   })
 }
@@ -134,7 +168,7 @@ export async function getProject(
   projectName: string,
   domain: string
 ): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     interface Project {
       id: string
     }
@@ -153,18 +187,24 @@ export async function getProject(
         }
       }
     )
-      .then((response) => response.json())
-      .then((data) => {
-        // Handle the received data, e.g., save to auth_tokens.json
-        try {
-          resolve((data as responseBody).data[0].id)
-        } catch {
-          resolve('')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            `Failed to get project with status ${response.status}`
+          )
         }
+        return response.json()
+      })
+      .then((data) => {
+        const projectId = (data as responseBody).data?.[0]?.id
+        // Return empty string if project not found (will trigger import)
+        resolve(projectId || '')
       })
       .catch((error) => {
-        console.error('Error during authentication:', error)
-        // rejects(new Error('Failed to authenticate'))
+        console.error('Error getting project:', error)
+        reject(
+          error instanceof Error ? error : new Error('Failed to get project')
+        )
       })
   })
 }
@@ -184,7 +224,7 @@ export async function getAnalyzer(
   analyzerName: string,
   domain: string
 ): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     interface responseBody {
       data: {
         id: string
@@ -201,14 +241,28 @@ export async function getAnalyzer(
         }
       }
     )
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            `Failed to get analyzer with status ${response.status}`
+          )
+        }
+        return response.json()
+      })
       .then((data) => {
-        // Handle the received data, e.g., save to auth_tokens.json
-        resolve((data as responseBody).data.id)
+        const analyzerId = (data as responseBody).data?.id
+        if (!analyzerId) {
+          throw new Error(
+            `Failed to get analyzer: analyzer '${analyzerName}' not found`
+          )
+        }
+        resolve(analyzerId)
       })
       .catch((error) => {
-        console.error('Error during authentication:', error)
-        // rejects(new Error('Failed to authenticate'))
+        console.error('Error getting analyzer:', error)
+        reject(
+          error instanceof Error ? error : new Error('Failed to get analyzer')
+        )
       })
   })
 }
@@ -226,7 +280,7 @@ export async function getGithuIntegration(
   organizationId: string,
   domain: string
 ): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     interface Integration {
       id: string
       integration_type: string
@@ -244,19 +298,36 @@ export async function getGithuIntegration(
         Authorization: `Bearer ${token}`
       }
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            `Failed to get integrations with status ${response.status}`
+          )
+        }
+        return response.json()
+      })
       .then((data) => {
-        // Handle the received data, e.g., save to auth_tokens.json
-        for (const integration of (data as responseBody).data) {
-          if (integration.integration_provider == 'GITHUB') {
+        const integrations = (data as responseBody).data
+        if (!integrations || !Array.isArray(integrations)) {
+          throw new Error('Failed to get integrations: invalid response')
+        }
+        for (const integration of integrations) {
+          if (integration.integration_provider === 'GITHUB') {
             resolve(integration.id)
-            break
+            return
           }
         }
+        throw new Error(
+          'Failed to get integration: no GitHub integration found'
+        )
       })
       .catch((error) => {
-        console.error('Error during authentication:', error)
-        // rejects(new Error('Failed to authenticate'))
+        console.error('Error getting GitHub integration:', error)
+        reject(
+          error instanceof Error
+            ? error
+            : new Error('Failed to get GitHub integration')
+        )
       })
   })
 }
@@ -289,7 +360,12 @@ export async function getResult(
   analysisId: string,
   domain: string
 ): Promise<vulnerabilityReponseBody> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    if (!analysisId) {
+      reject(new Error('Failed to get results: analysisId is required'))
+      return
+    }
+
     fetch(
       `https://${domain}/api/org/${organizationId}/projects/${projectId}/analysis/${analysisId}/vulnerabilities/stats?workspace=.`,
       {
@@ -300,14 +376,30 @@ export async function getResult(
         }
       }
     )
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          // Return status code for retry logic in main.ts
+          resolve({
+            data: {} as vulnerabilityReponseBody['data'],
+            status_code: response.status
+          })
+          return null
+        }
+        return response.json()
+      })
       .then((data) => {
-        // Handle the received data, e.g., save to auth_tokens.json
-        resolve(data as vulnerabilityReponseBody)
+        if (data === null) return
+        const result = data as vulnerabilityReponseBody
+        if (!result.data) {
+          throw new Error('Failed to get results: invalid response format')
+        }
+        resolve(result)
       })
       .catch((error) => {
-        console.error('Error during authentication:', error)
-        // rejects(new Error('Failed to authenticate'))
+        console.error('Error getting results:', error)
+        reject(
+          error instanceof Error ? error : new Error('Failed to get results')
+        )
       })
   })
 }
@@ -329,7 +421,7 @@ export async function importProject(
   integrationID: string,
   projectName: string
 ): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     // Perform an HTTP POST request using fetch
     const requestBody = {
       integration_id: integrationID,
@@ -352,14 +444,26 @@ export async function importProject(
       },
       body: JSON.stringify(requestBody)
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            `Failed to import project with status ${response.status}`
+          )
+        }
+        return response.json()
+      })
       .then((data) => {
-        // Handle the received data, e.g., save to auth_tokens.json
-        resolve((data as responseBody).id)
+        const projectId = (data as responseBody).id
+        if (!projectId) {
+          throw new Error('Failed to import project: no project ID returned')
+        }
+        resolve(projectId)
       })
       .catch((error) => {
-        console.error('Error during authentication:', error)
-        // rejects(new Error('Failed to authenticate'))
+        console.error('Error importing project:', error)
+        reject(
+          error instanceof Error ? error : new Error('Failed to import project')
+        )
       })
   })
 }
@@ -383,7 +487,7 @@ export async function startAnalysis(
   analyzerID: string,
   branchName: string
 ): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     // Perform an HTTP POST request using fetch
     const requestBody = {
       analyzer_id: analyzerID,
@@ -403,6 +507,11 @@ export async function startAnalysis(
       id: string
     }
 
+    interface errorResponseBody {
+      message?: string
+      error?: string
+    }
+
     fetch(
       `https://${domain}/api/org/${organizationID}/projects/${projectID}/analyses`,
       {
@@ -415,14 +524,29 @@ export async function startAnalysis(
         body: JSON.stringify(requestBody)
       }
     )
-      .then((response) => response.json())
+      .then(async (response) => {
+        if (!response.ok) {
+          const errorData = (await response
+            .json()
+            .catch(() => ({}))) as errorResponseBody
+          const errorMessage =
+            errorData.message || errorData.error || `HTTP ${response.status}`
+          throw new Error(`Failed to start analysis: ${errorMessage}`)
+        }
+        return response.json()
+      })
       .then((data) => {
-        // Handle the received data, e.g., save to auth_tokens.json
-        resolve((data as responseBody).id)
+        const analysisId = (data as responseBody).id
+        if (!analysisId) {
+          throw new Error('Failed to start analysis: no analysis ID returned')
+        }
+        resolve(analysisId)
       })
       .catch((error) => {
-        console.error('Error during authentication:', error)
-        // rejects(new Error('Failed to authenticate'))
+        console.error('Error starting analysis:', error)
+        reject(
+          error instanceof Error ? error : new Error('Failed to start analysis')
+        )
       })
   })
 }

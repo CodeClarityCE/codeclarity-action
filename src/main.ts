@@ -106,6 +106,12 @@ export async function run(): Promise<void> {
       analyzerId,
       branch
     )
+
+    if (!analysisId) {
+      core.setFailed('Failed to start analysis: no analysis ID returned')
+      return
+    }
+
     core.debug('Analysis ID: ' + analysisId)
 
     // Fetch results
@@ -121,7 +127,7 @@ export async function run(): Promise<void> {
       domain
     )
 
-    if (result.status_code == 500) {
+    if (result.status_code === 500) {
       core.debug('Initial attempt failed. Retrying...')
       // Wait 30 seconds before retrying
       await new Promise((resolve) => setTimeout(resolve, 30000))
@@ -132,6 +138,13 @@ export async function run(): Promise<void> {
         analysisId,
         domain
       )
+    }
+
+    if (!result.data || typeof result.data.number_of_critical === 'undefined') {
+      core.setFailed(
+        'Failed to get analysis results: invalid response from server'
+      )
+      return
     }
 
     core.debug(new Date().toTimeString())
