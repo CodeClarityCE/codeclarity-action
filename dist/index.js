@@ -27255,7 +27255,7 @@ var coreExports = requireCore();
  * @returns Resolves with 'done!' after the wait is over.
  */
 async function authenticate(email, password, domain) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         // Perform an HTTP POST request using fetch
         const requestBody = {
             email: email,
@@ -27269,14 +27269,22 @@ async function authenticate(email, password, domain) {
             },
             body: JSON.stringify(requestBody)
         })
-            .then((response) => response.json())
+            .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Authentication failed with status ${response.status}`);
+            }
+            return response.json();
+        })
             .then((data) => {
-            // Handle the received data, e.g., save to auth_tokens.json
-            resolve(data.data.token);
+            const token = data.data?.token;
+            if (!token) {
+                throw new Error('Authentication failed: no token received');
+            }
+            resolve(token);
         })
             .catch((error) => {
             console.error('Error during authentication:', error);
-            // rejects(new Error('Failed to authenticate'))
+            reject(error instanceof Error ? error : new Error('Failed to authenticate'));
         });
     });
 }
@@ -27288,7 +27296,7 @@ async function authenticate(email, password, domain) {
  * @returns Resolves with 'done!' after the wait is over.
  */
 async function getUser(token, domain) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         fetch(`https://${domain}/api/auth/user`, {
             method: 'GET',
             headers: {
@@ -27296,14 +27304,22 @@ async function getUser(token, domain) {
                 Authorization: `Bearer ${token}`
             }
         })
-            .then((response) => response.json())
+            .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Failed to get user with status ${response.status}`);
+            }
+            return response.json();
+        })
             .then((data) => {
-            // Handle the received data, e.g., save to auth_tokens.json
-            resolve(data.data.id);
+            const userId = data.data?.id;
+            if (!userId) {
+                throw new Error('Failed to get user: no user ID received');
+            }
+            resolve(userId);
         })
             .catch((error) => {
-            console.error('Error during authentication:', error);
-            // rejects(new Error('Failed to authenticate'))
+            console.error('Error getting user:', error);
+            reject(error instanceof Error ? error : new Error('Failed to get user'));
         });
     });
 }
@@ -27315,7 +27331,7 @@ async function getUser(token, domain) {
  * @returns Resolves with 'done!' after the wait is over.
  */
 async function getOrganization(token, domain) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         fetch(`https://${domain}/api/org`, {
             method: 'GET',
             headers: {
@@ -27323,14 +27339,24 @@ async function getOrganization(token, domain) {
                 Authorization: `Bearer ${token}`
             }
         })
-            .then((response) => response.json())
+            .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Failed to get organization with status ${response.status}`);
+            }
+            return response.json();
+        })
             .then((data) => {
-            // Handle the received data, e.g., save to auth_tokens.json
-            resolve(data.data[0].organization.id);
+            const orgId = data.data?.[0]?.organization?.id;
+            if (!orgId) {
+                throw new Error('Failed to get organization: no organization found');
+            }
+            resolve(orgId);
         })
             .catch((error) => {
-            console.error('Error during authentication:', error);
-            // rejects(new Error('Failed to authenticate'))
+            console.error('Error getting organization:', error);
+            reject(error instanceof Error
+                ? error
+                : new Error('Failed to get organization'));
         });
     });
 }
@@ -27344,7 +27370,7 @@ async function getOrganization(token, domain) {
  * @returns Resolves with 'done!' after the wait is over.
  */
 async function getProject(token, organizationId, projectName, domain) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         fetch(`https://${domain}/api/org/${organizationId}/projects?search_key=${projectName}`, {
             method: 'GET',
             headers: {
@@ -27352,19 +27378,20 @@ async function getProject(token, organizationId, projectName, domain) {
                 Authorization: `Bearer ${token}`
             }
         })
-            .then((response) => response.json())
+            .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Failed to get project with status ${response.status}`);
+            }
+            return response.json();
+        })
             .then((data) => {
-            // Handle the received data, e.g., save to auth_tokens.json
-            try {
-                resolve(data.data[0].id);
-            }
-            catch {
-                resolve('');
-            }
+            const projectId = data.data?.[0]?.id;
+            // Return empty string if project not found (will trigger import)
+            resolve(projectId || '');
         })
             .catch((error) => {
-            console.error('Error during authentication:', error);
-            // rejects(new Error('Failed to authenticate'))
+            console.error('Error getting project:', error);
+            reject(error instanceof Error ? error : new Error('Failed to get project'));
         });
     });
 }
@@ -27378,7 +27405,7 @@ async function getProject(token, organizationId, projectName, domain) {
  * @returns Resolves with 'done!' after the wait is over.
  */
 async function getAnalyzer(token, organizationId, analyzerName, domain) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         fetch(`https://${domain}/api/org/${organizationId}/analyzers/name?analyzer_name=${analyzerName}`, {
             method: 'GET',
             headers: {
@@ -27386,14 +27413,22 @@ async function getAnalyzer(token, organizationId, analyzerName, domain) {
                 Authorization: `Bearer ${token}`
             }
         })
-            .then((response) => response.json())
+            .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Failed to get analyzer with status ${response.status}`);
+            }
+            return response.json();
+        })
             .then((data) => {
-            // Handle the received data, e.g., save to auth_tokens.json
-            resolve(data.data.id);
+            const analyzerId = data.data?.id;
+            if (!analyzerId) {
+                throw new Error(`Failed to get analyzer: analyzer '${analyzerName}' not found`);
+            }
+            resolve(analyzerId);
         })
             .catch((error) => {
-            console.error('Error during authentication:', error);
-            // rejects(new Error('Failed to authenticate'))
+            console.error('Error getting analyzer:', error);
+            reject(error instanceof Error ? error : new Error('Failed to get analyzer'));
         });
     });
 }
@@ -27406,7 +27441,7 @@ async function getAnalyzer(token, organizationId, analyzerName, domain) {
  * @returns Resolves with 'done!' after the wait is over.
  */
 async function getGithuIntegration(token, organizationId, domain) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         fetch(`https://${domain}/api/org/${organizationId}/integrations/vcs`, {
             method: 'GET',
             headers: {
@@ -27414,19 +27449,30 @@ async function getGithuIntegration(token, organizationId, domain) {
                 Authorization: `Bearer ${token}`
             }
         })
-            .then((response) => response.json())
+            .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Failed to get integrations with status ${response.status}`);
+            }
+            return response.json();
+        })
             .then((data) => {
-            // Handle the received data, e.g., save to auth_tokens.json
-            for (const integration of data.data) {
-                if (integration.integration_provider == 'GITHUB') {
+            const integrations = data.data;
+            if (!integrations || !Array.isArray(integrations)) {
+                throw new Error('Failed to get integrations: invalid response');
+            }
+            for (const integration of integrations) {
+                if (integration.integration_provider === 'GITHUB') {
                     resolve(integration.id);
-                    break;
+                    return;
                 }
             }
+            throw new Error('Failed to get integration: no GitHub integration found');
         })
             .catch((error) => {
-            console.error('Error during authentication:', error);
-            // rejects(new Error('Failed to authenticate'))
+            console.error('Error getting GitHub integration:', error);
+            reject(error instanceof Error
+                ? error
+                : new Error('Failed to get GitHub integration'));
         });
     });
 }
@@ -27441,7 +27487,11 @@ async function getGithuIntegration(token, organizationId, domain) {
  * @returns Resolves with 'done!' after the wait is over.
  */
 async function getResult(token, organizationId, projectId, analysisId, domain) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+        if (!analysisId) {
+            reject(new Error('Failed to get results: analysisId is required'));
+            return;
+        }
         fetch(`https://${domain}/api/org/${organizationId}/projects/${projectId}/analysis/${analysisId}/vulnerabilities/stats?workspace=.`, {
             method: 'GET',
             headers: {
@@ -27449,14 +27499,29 @@ async function getResult(token, organizationId, projectId, analysisId, domain) {
                 Authorization: `Bearer ${token}`
             }
         })
-            .then((response) => response.json())
+            .then((response) => {
+            if (!response.ok) {
+                // Return status code for retry logic in main.ts
+                resolve({
+                    data: {},
+                    status_code: response.status
+                });
+                return null;
+            }
+            return response.json();
+        })
             .then((data) => {
-            // Handle the received data, e.g., save to auth_tokens.json
-            resolve(data);
+            if (data === null)
+                return;
+            const result = data;
+            if (!result.data) {
+                throw new Error('Failed to get results: invalid response format');
+            }
+            resolve(result);
         })
             .catch((error) => {
-            console.error('Error during authentication:', error);
-            // rejects(new Error('Failed to authenticate'))
+            console.error('Error getting results:', error);
+            reject(error instanceof Error ? error : new Error('Failed to get results'));
         });
     });
 }
@@ -27470,7 +27535,7 @@ async function getResult(token, organizationId, projectId, analysisId, domain) {
  * @returns Resolves with 'done!' after the wait is over.
  */
 async function importProject(token, serverUrl, domain, organizationID, integrationID, projectName) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         // Perform an HTTP POST request using fetch
         const requestBody = {
             integration_id: integrationID,
@@ -27487,14 +27552,22 @@ async function importProject(token, serverUrl, domain, organizationID, integrati
             },
             body: JSON.stringify(requestBody)
         })
-            .then((response) => response.json())
+            .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Failed to import project with status ${response.status}`);
+            }
+            return response.json();
+        })
             .then((data) => {
-            // Handle the received data, e.g., save to auth_tokens.json
-            resolve(data.id);
+            const projectId = data.id;
+            if (!projectId) {
+                throw new Error('Failed to import project: no project ID returned');
+            }
+            resolve(projectId);
         })
             .catch((error) => {
-            console.error('Error during authentication:', error);
-            // rejects(new Error('Failed to authenticate'))
+            console.error('Error importing project:', error);
+            reject(error instanceof Error ? error : new Error('Failed to import project'));
         });
     });
 }
@@ -27510,7 +27583,7 @@ async function importProject(token, serverUrl, domain, organizationID, integrati
  * @returns Resolves with 'done!' after the wait is over.
  */
 async function startAnalysis(token, domain, organizationID, projectID, analyzerID, branchName) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         // Perform an HTTP POST request using fetch
         const requestBody = {
             analyzer_id: analyzerID,
@@ -27534,14 +27607,26 @@ async function startAnalysis(token, domain, organizationID, projectID, analyzerI
             },
             body: JSON.stringify(requestBody)
         })
-            .then((response) => response.json())
+            .then(async (response) => {
+            if (!response.ok) {
+                const errorData = (await response
+                    .json()
+                    .catch(() => ({})));
+                const errorMessage = errorData.message || errorData.error || `HTTP ${response.status}`;
+                throw new Error(`Failed to start analysis: ${errorMessage}`);
+            }
+            return response.json();
+        })
             .then((data) => {
-            // Handle the received data, e.g., save to auth_tokens.json
-            resolve(data.id);
+            const analysisId = data.id;
+            if (!analysisId) {
+                throw new Error('Failed to start analysis: no analysis ID returned');
+            }
+            resolve(analysisId);
         })
             .catch((error) => {
-            console.error('Error during authentication:', error);
-            // rejects(new Error('Failed to authenticate'))
+            console.error('Error starting analysis:', error);
+            reject(error instanceof Error ? error : new Error('Failed to start analysis'));
         });
     });
 }
@@ -27599,16 +27684,24 @@ async function run() {
         coreExports.debug('Analyzer ID: ' + analyzerId);
         // Start analysis
         const analysisId = await startAnalysis(userToken, domain, organizationId, projectId, analyzerId, branch);
+        if (!analysisId) {
+            coreExports.setFailed('Failed to start analysis: no analysis ID returned');
+            return;
+        }
         coreExports.debug('Analysis ID: ' + analysisId);
         // Fetch results
         // Wait 15 seconds
         await new Promise((resolve) => setTimeout(resolve, 15000));
         let result = await getResult(userToken, organizationId, projectId, analysisId, domain);
-        if (result.status_code == 500) {
+        if (result.status_code === 500) {
             coreExports.debug('Initial attempt failed. Retrying...');
             // Wait 30 seconds before retrying
             await new Promise((resolve) => setTimeout(resolve, 30000));
             result = await getResult(userToken, organizationId, projectId, analysisId, domain);
+        }
+        if (!result.data || typeof result.data.number_of_critical === 'undefined') {
+            coreExports.setFailed('Failed to get analysis results: invalid response from server');
+            return;
         }
         coreExports.debug(new Date().toTimeString());
         const severityLevels = [
