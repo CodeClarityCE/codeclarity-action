@@ -72,7 +72,7 @@ jobs:
           branch: ${{ steps.branch-names.outputs.current_branch }}
           serverUrl: ${{ github.server_url }}
           projectName: ${{ github.repository }}
-          analyzerName: 'JS Analyser'
+          analyzerName: 'JavaScript Analyzer'
           failOnCritical: false
           failOnHigh: false
           failOnMedium: false
