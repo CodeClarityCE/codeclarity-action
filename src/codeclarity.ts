@@ -494,7 +494,8 @@ export async function startAnalysis(
       branch: branchName,
       config: {
         'js-sbom': {
-          branch: branchName
+          branch: branchName,
+          project: `${organizationID}/projects/${projectID}/${branchName}`
         },
         'license-finder': {
           licensePolicy: []
