@@ -22,3 +22,12 @@ MD030:
 # Code block style
 MD046:
   style: fenced
+
+# Allow specific inline HTML elements (for responsive images and collapsible sections)
+MD033:
+  allowed_elements:
+    - picture
+    - source
+    - img
+    - details
+    - summary

@@ -425,7 +425,7 @@ export async function importProject(
     // Perform an HTTP POST request using fetch
     const requestBody = {
       integration_id: integrationID,
-      url: `https://${serverUrl}/${projectName}`,
+      url: `${serverUrl}/${projectName}`,
       name: projectName,
       description: 'Imported by Github Action'
     }
