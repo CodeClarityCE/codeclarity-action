@@ -60,5 +60,5 @@ outputs:
     description: The vulnerabilities found in your project
 
 runs:
-  using: node20
+  using: node24
   main: dist/index.js
