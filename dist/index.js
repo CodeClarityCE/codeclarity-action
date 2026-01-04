@@ -27590,11 +27590,10 @@ async function startAnalysis(token, domain, organizationID, projectID, analyzerI
             branch: branchName,
             config: {
                 'js-sbom': {
-                    branch: branchName,
-                    project: `${organizationID}/projects/${projectID}/${branchName}`
+                    branch: branchName
                 },
-                'js-license': {
-                    licensePolicy: ['']
+                'license-finder': {
+                    licensePolicy: []
                 }
             }
         };
